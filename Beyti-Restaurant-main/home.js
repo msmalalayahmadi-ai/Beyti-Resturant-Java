@@ -1,4 +1,9 @@
 
+/* ==========================================
+   BEYTI RESTAURANT - HOME JAVASCRIPT
+   ========================================== */
+
+
 // ==========================================
 // 1. MOBILE NAVIGATION
 // ==========================================
@@ -7,11 +12,17 @@ const menuCheckbox = document.querySelector("#menu");
 const navLinks = document.querySelector(".nav-links");
 
 if (menuCheckbox && navLinks) {
+
     navLinks.addEventListener("click", function(event) {
+
         if (event.target.closest("a")) {
+
             menuCheckbox.checked = false;
+
         }
+
     });
+
 }
 
 
@@ -30,68 +41,184 @@ if (reservationForm) {
     const guestsInput = reservationForm.querySelector('input[type="number"]');
     const phoneInput = reservationForm.querySelector('input[type="tel"]');
 
-    const today = new Date();
-    const localDate = new Date(
-        today.getTime() - today.getTimezoneOffset() * 60000
-    ).toISOString().split("T")[0];
+    // Check whether all required HTML elements exist
 
-    dateInput.min = localDate;
+    if (
+        !nameInput ||
+        !emailInput ||
+        !dateInput ||
+        !timeInput ||
+        !guestsInput ||
+        !phoneInput
+    ) {
 
-    nameInput.required = true;
-    emailInput.required = true;
-    dateInput.required = true;
-    timeInput.required = true;
-    guestsInput.required = true;
+        console.error("Reservation form inputs were not found.");
 
-    guestsInput.min = 1;
-    guestsInput.max = 20;
+    } else {
 
-    reservationForm.addEventListener("submit", function(event) {
+        // Get today's date in local time
 
-        event.preventDefault();
+        function getTodayDate() {
 
-        if (!reservationForm.checkValidity()) {
-            reservationForm.reportValidity();
-            return;
+            const today = new Date();
+
+            const localDate = new Date(
+                today.getTime() - today.getTimezoneOffset() * 60000
+            ).toISOString().split("T")[0];
+
+            return localDate;
+
         }
 
-        const name = nameInput.value.trim();
-        const email = emailInput.value.trim();
-        const date = dateInput.value;
-        const time = timeInput.value;
-        const guests = Number(guestsInput.value);
-        const phone = phoneInput.value.trim();
+        // Prevent selecting a past date
 
-        if (name === "" || email === "") {
-            alert("Please enter your name and email.");
-            return;
-        }
+        dateInput.min = getTodayDate();
 
-        if (guests < 1 || guests > 20) {
-            alert("Please select between 1 and 20 guests.");
-            return;
-        }
+        // Set required fields
 
-        const reservation = {
-            name,
-            email,
-            date,
-            time,
-            guests,
-            phone
-        };
+        nameInput.required = true;
+        emailInput.required = true;
+        dateInput.required = true;
+        timeInput.required = true;
+        guestsInput.required = true;
+        phoneInput.required = true;
 
-        console.log("Reservation Details:", reservation);
+        // Set guest limits
 
-        showMessage(
-            reservationForm,
-            "Your reservation request has been checked successfully! Please contact the restaurant to confirm your booking.",
-            "success"
-        );
+        guestsInput.min = 1;
+        guestsInput.max = 20;
+        guestsInput.step = 1;
 
-        reservationForm.reset();
-        dateInput.min = localDate;
-    });
+        // Reservation form submission
+
+        reservationForm.addEventListener("submit", function(event) {
+
+            event.preventDefault();
+
+            // Check browser form validation
+
+            if (!reservationForm.checkValidity()) {
+
+                reservationForm.reportValidity();
+
+                return;
+
+            }
+
+            // Get input values
+
+            const name = nameInput.value.trim();
+            const email = emailInput.value.trim();
+            const date = dateInput.value;
+            const time = timeInput.value;
+            const guests = Number(guestsInput.value);
+            const phone = phoneInput.value.trim();
+
+            // Validate name
+
+            if (name.length < 2) {
+
+                alert("Please enter a valid name.");
+
+                nameInput.focus();
+
+                return;
+
+            }
+
+            // Validate email
+
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+            if (!emailPattern.test(email)) {
+
+                alert("Please enter a valid email address.");
+
+                emailInput.focus();
+
+                return;
+
+            }
+
+            // Validate reservation date
+
+            if (date < getTodayDate()) {
+
+                alert("Please select today or a future date.");
+
+                dateInput.focus();
+
+                return;
+
+            }
+
+            // Validate number of guests
+
+            if (
+                !Number.isInteger(guests) ||
+                guests < 1 ||
+                guests > 20
+            ) {
+
+                alert("Please select between 1 and 20 guests.");
+
+                guestsInput.focus();
+
+                return;
+
+            }
+
+            // Validate phone number
+
+            const phoneDigits = phone.replace(/\D/g, "");
+
+            if (phoneDigits.length < 7 || phoneDigits.length > 15) {
+
+                alert("Please enter a valid phone number.");
+
+                phoneInput.focus();
+
+                return;
+
+            }
+
+            // Create reservation object
+
+            const reservation = {
+
+                name: name,
+                email: email,
+                date: date,
+                time: time,
+                guests: guests,
+                phone: phone
+
+            };
+
+            // Display reservation information in console
+
+            console.log("Reservation Details:", reservation);
+
+            // Show success message
+
+            showMessage(
+                reservationForm,
+                "Your reservation request has been checked successfully! Please contact the restaurant to confirm your booking.",
+                "success"
+            );
+
+            // Reset form
+
+            reservationForm.reset();
+
+            // Set minimum date again
+
+            dateInput.min = getTodayDate();
+
+        });
+
+    }
+
 }
 
 
@@ -103,36 +230,64 @@ const newsletterForm = document.querySelector("#Quick_Links form");
 
 if (newsletterForm) {
 
-    const newsletterEmail = newsletterForm.querySelector('input[type="email"]');
+    const newsletterEmail = newsletterForm.querySelector(
+        'input[type="email"]'
+    );
 
-    newsletterEmail.required = true;
+    if (newsletterEmail) {
 
-    newsletterForm.addEventListener("submit", function(event) {
+        newsletterEmail.required = true;
 
-        event.preventDefault();
+        newsletterForm.addEventListener("submit", function(event) {
 
-        if (!newsletterForm.checkValidity()) {
-            newsletterForm.reportValidity();
-            return;
-        }
+            event.preventDefault();
 
-        const email = newsletterEmail.value.trim();
+            // Check email validation
 
-        if (email === "") {
-            alert("Please enter your email address.");
-            return;
-        }
+            if (!newsletterForm.checkValidity()) {
 
-        console.log("Newsletter Email:", email);
+                newsletterForm.reportValidity();
 
-        showMessage(
-            newsletterForm,
-            "Thank you! Your email has been checked successfully.",
-            "success"
-        );
+                return;
 
-        newsletterForm.reset();
-    });
+            }
+
+            const email = newsletterEmail.value.trim();
+
+            // Validate email format
+
+            const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+            if (!emailPattern.test(email)) {
+
+                alert("Please enter a valid email address.");
+
+                newsletterEmail.focus();
+
+                return;
+
+            }
+
+            // Display email in console
+
+            console.log("Newsletter Email:", email);
+
+            // Show success message
+
+            showMessage(
+                newsletterForm,
+                "Thank you! Your email has been checked successfully.",
+                "success"
+            );
+
+            // Reset newsletter form
+
+            newsletterForm.reset();
+
+        });
+
+    }
+
 }
 
 
@@ -146,60 +301,87 @@ if (gallery) {
 
     const images = gallery.querySelectorAll("img");
 
-    const lightbox = document.createElement("div");
+    if (images.length > 0) {
 
-    lightbox.style.cssText = `
-        display: none;
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.9);
-        justify-content: center;
-        align-items: center;
-        z-index: 9999;
-        cursor: pointer;
-    `;
+        // Create lightbox
 
-    const previewImage = document.createElement("img");
+        const lightbox = document.createElement("div");
 
-    previewImage.style.cssText = `
-        max-width: 85%;
-        max-height: 85%;
-        object-fit: contain;
-        border-radius: 10px;
-        cursor: default;
-    `;
+        lightbox.style.cssText = `
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            cursor: pointer;
+        `;
 
-    lightbox.appendChild(previewImage);
-    document.body.appendChild(lightbox);
+        // Create preview image
 
-    gallery.addEventListener("click", function(event) {
+        const previewImage = document.createElement("img");
 
-        const clickedImage = event.target.closest("img");
+        previewImage.style.cssText = `
+            max-width: 85%;
+            max-height: 85%;
+            object-fit: contain;
+            border-radius: 10px;
+            cursor: default;
+        `;
 
-        if (!clickedImage) return;
+        lightbox.appendChild(previewImage);
 
-        previewImage.src = clickedImage.src;
-        previewImage.alt = clickedImage.alt;
+        document.body.appendChild(lightbox);
 
-        lightbox.style.display = "flex";
-    });
+        // Open image on click
 
-    lightbox.addEventListener("click", function(event) {
+        gallery.addEventListener("click", function(event) {
 
-        if (event.target !== previewImage) {
-            lightbox.style.display = "none";
-        }
-    });
+            const clickedImage = event.target.closest("img");
 
-    document.addEventListener("keydown", function(event) {
+            if (!clickedImage || !gallery.contains(clickedImage)) return;
 
-        if (event.key === "Escape") {
-            lightbox.style.display = "none";
-        }
-    });
+            previewImage.src = clickedImage.src;
+
+            previewImage.alt = clickedImage.alt;
+
+            lightbox.style.display = "flex";
+
+        });
+
+        // Close lightbox
+
+        lightbox.addEventListener("click", function(event) {
+
+            if (event.target !== previewImage) {
+
+                lightbox.style.display = "none";
+
+            }
+
+        });
+
+        // Close lightbox with Escape key
+
+        document.addEventListener("keydown", function(event) {
+
+            if (
+                event.key === "Escape" &&
+                lightbox.style.display === "flex"
+            ) {
+
+                lightbox.style.display = "none";
+
+            }
+
+        });
+
+    }
+
 }
 
 
@@ -207,19 +389,33 @@ if (gallery) {
 // 5. MENU INTERACTION
 // ==========================================
 
-const menuCards = document.querySelectorAll("#Our_Menu .menu article");
+const menuCards = document.querySelectorAll(
+    "#Our_Menu .menu article"
+);
 
 menuCards.forEach(function(card) {
 
     card.addEventListener("click", function() {
 
-        const dishName = card.querySelector("div p").textContent;
-        const dishPrice = card.querySelector("div span").textContent;
+        const dishNameElement = card.querySelector("div p");
+
+        const dishPriceElement = card.querySelector("div span");
+
+        // Check whether dish information exists
+
+        if (!dishNameElement || !dishPriceElement) return;
+
+        const dishName = dishNameElement.textContent.trim();
+
+        const dishPrice = dishPriceElement.textContent.trim();
+
+        // Display dish information
 
         alert(
             "Dish: " + dishName +
             "\nPrice: " + dishPrice
         );
+
     });
 
 });
@@ -229,9 +425,13 @@ menuCards.forEach(function(card) {
 // 6. REUSABLE MESSAGE FUNCTION
 // ==========================================
 
-function showMessage(form, message, type) {
+function showMessage(form, message, type = "success") {
+
+    if (!form) return;
 
     let messageBox = form.querySelector(".js-message");
+
+    // Create message element if it does not exist
 
     if (!messageBox) {
 
@@ -242,12 +442,19 @@ function showMessage(form, message, type) {
         messageBox.setAttribute("role", "status");
 
         form.appendChild(messageBox);
+
     }
+
+    // Set message text
 
     messageBox.textContent = message;
 
+    // Style message box
+
     messageBox.style.padding = "12px";
+
     messageBox.style.marginTop = "12px";
+
     messageBox.style.borderRadius = "6px";
 
     messageBox.style.backgroundColor =
@@ -255,4 +462,12 @@ function showMessage(form, message, type) {
 
     messageBox.style.color =
         type === "success" ? "#155724" : "#721c24";
+
 }
+
+
+// ==========================================
+// 7. CONSOLE SUCCESS MESSAGE
+// ==========================================
+
+console.log("Beyti Home JavaScript loaded successfully!");

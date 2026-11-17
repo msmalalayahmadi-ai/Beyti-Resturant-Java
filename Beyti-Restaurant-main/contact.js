@@ -26,7 +26,9 @@ if (navLinks && menuCheckbox) {
         const clickedLink = event.target.closest("a");
 
         if (clickedLink) {
+
             menuCheckbox.checked = false;
+
         }
 
     });
@@ -38,6 +40,21 @@ if (navLinks && menuCheckbox) {
 // 3. SET MINIMUM RESERVATION DATE
 // ==========================================
 
+function setMinimumDate(dateInput) {
+
+    const today = new Date();
+
+    const year = today.getFullYear();
+
+    const month = String(today.getMonth() + 1).padStart(2, "0");
+
+    const day = String(today.getDate()).padStart(2, "0");
+
+    dateInput.min = `${year}-${month}-${day}`;
+
+}
+
+
 if (reservationForm) {
 
     const dateInput = reservationForm.querySelector(
@@ -46,17 +63,8 @@ if (reservationForm) {
 
     if (dateInput) {
 
-        const today = new Date();
+        setMinimumDate(dateInput);
 
-        const year = today.getFullYear();
-
-        const month = String(today.getMonth() + 1).padStart(2, "0");
-
-        const day = String(today.getDate()).padStart(2, "0");
-
-        const todayDate = `${year}-${month}-${day}`;
-
-        dateInput.min = todayDate;
     }
 
 }
@@ -72,21 +80,65 @@ if (reservationForm) {
 
         event.preventDefault();
 
-        const inputs = reservationForm.querySelectorAll("input");
+        const nameInput = reservationForm.querySelector(
+            'input[type="text"]'
+        );
 
-        const name = inputs[0].value.trim();
+        const emailInput = reservationForm.querySelector(
+            'input[type="email"]'
+        );
 
-        const email = inputs[1].value.trim();
+        const dateInput = reservationForm.querySelector(
+            'input[type="date"]'
+        );
 
-        const date = inputs[2].value;
+        const timeInput = reservationForm.querySelector(
+            'input[type="time"]'
+        );
 
-        const time = inputs[3].value;
+        const guestsInput = reservationForm.querySelector(
+            'input[type="number"]'
+        );
 
-        const guests = Number(inputs[4].value);
+        const phoneInput = reservationForm.querySelector(
+            'input[type="tel"]'
+        );
 
-        const phone = inputs[5].value.trim();
+        const messageInput = reservationForm.querySelector("textarea");
 
-        const message = reservationForm.querySelector("textarea").value.trim();
+
+        // Check required elements
+
+        if (
+            !nameInput ||
+            !emailInput ||
+            !dateInput ||
+            !timeInput ||
+            !guestsInput ||
+            !phoneInput ||
+            !messageInput
+        ) {
+
+            alert("Reservation form elements are missing.");
+
+            return;
+
+        }
+
+
+        const name = nameInput.value.trim();
+
+        const email = emailInput.value.trim();
+
+        const date = dateInput.value;
+
+        const time = timeInput.value;
+
+        const guests = Number(guestsInput.value);
+
+        const phone = phoneInput.value.trim();
+
+        const message = messageInput.value.trim();
 
 
         // Check empty fields
@@ -96,13 +148,14 @@ if (reservationForm) {
             email === "" ||
             date === "" ||
             time === "" ||
-            inputs[4].value === "" ||
+            guestsInput.value === "" ||
             phone === ""
         ) {
 
             alert("Please complete all required fields.");
 
             return;
+
         }
 
 
@@ -113,6 +166,7 @@ if (reservationForm) {
             alert("Please enter a valid name.");
 
             return;
+
         }
 
 
@@ -125,22 +179,28 @@ if (reservationForm) {
             alert("Please enter a valid email address.");
 
             return;
+
         }
 
 
         // Check reservation date
 
-        const selectedDate = new Date(date + "T00:00:00");
-
         const today = new Date();
 
-        today.setHours(0, 0, 0, 0);
+        const year = today.getFullYear();
 
-        if (selectedDate < today) {
+        const month = String(today.getMonth() + 1).padStart(2, "0");
+
+        const day = String(today.getDate()).padStart(2, "0");
+
+        const todayDate = `${year}-${month}-${day}`;
+
+        if (date < todayDate) {
 
             alert("Please select today or a future date.");
 
             return;
+
         }
 
 
@@ -151,6 +211,7 @@ if (reservationForm) {
             alert("The number of guests must be between 1 and 50.");
 
             return;
+
         }
 
 
@@ -163,6 +224,7 @@ if (reservationForm) {
             alert("Please enter a valid phone number.");
 
             return;
+
         }
 
 
@@ -205,21 +267,10 @@ if (reservationForm) {
 
         reservationForm.reset();
 
+
         // Set minimum date again after reset
 
-        const dateInput = reservationForm.querySelector(
-            'input[type="date"]'
-        );
-
-        if (dateInput) {
-
-            const now = new Date();
-
-            dateInput.min =
-                now.getFullYear() + "-" +
-                String(now.getMonth() + 1).padStart(2, "0") + "-" +
-                String(now.getDate()).padStart(2, "0");
-        }
+        setMinimumDate(dateInput);
 
     });
 
@@ -241,6 +292,7 @@ function showMessage(form, text, type) {
         messageBox.className = "js-message";
 
         form.appendChild(messageBox);
+
     }
 
     messageBox.textContent = text;
@@ -274,11 +326,13 @@ document.querySelectorAll(
     if (text.includes("+90 212 663 29 90")) {
 
         link.href = "tel:" + phoneNumber;
+
     }
 
     if (text.includes("rezervasyon@beyti.com")) {
 
         link.href = "mailto:" + emailAddress;
+
     }
 
 });
@@ -314,6 +368,7 @@ mapLinks.forEach(function(link) {
         link.target = "_blank";
 
         link.rel = "noopener noreferrer";
+
     }
 
 });
@@ -350,6 +405,8 @@ if (newsletterForm) {
             'input[type="email"]'
         );
 
+        if (!emailInput) return;
+
         const email = emailInput.value.trim();
 
         const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -360,6 +417,7 @@ if (newsletterForm) {
             alert("Please enter your email address.");
 
             return;
+
         }
 
 
@@ -368,6 +426,7 @@ if (newsletterForm) {
             alert("Please enter a valid email address.");
 
             return;
+
         }
 
 
@@ -401,6 +460,7 @@ faqItems.forEach(function(item) {
                 if (otherItem !== item) {
 
                     otherItem.open = false;
+
                 }
 
             });

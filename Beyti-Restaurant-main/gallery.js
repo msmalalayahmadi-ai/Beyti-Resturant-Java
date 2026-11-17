@@ -129,6 +129,8 @@ let currentImageIndex = 0;
 
 function showImage(index) {
 
+    if (!galleryContainer) return;
+
     const visibleImages = Array.from(
         galleryContainer.querySelectorAll("img")
     );
@@ -254,3 +256,8 @@ if (instagramLink) {
     });
 
 }
+
+
+// 10. CONSOLE SUCCESS MESSAGE
+
+console.log("Beyti Gallery JavaScript loaded successfully!");
